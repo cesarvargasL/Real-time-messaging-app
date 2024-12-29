@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { ChatMessage } from 'src/app/models/chat-message';
 import { ChatService } from 'src/app/services/chat.service';
 
 @Component({
@@ -8,10 +10,37 @@ import { ChatService } from 'src/app/services/chat.service';
 })
 export class ChatComponent implements OnInit {
 
-  constructor(private _chatService: ChatService) { }
+  public messageInput: string;
+  public userId: string;
+  public messageList: ChatMessage[];
+
+  constructor(private _chatService: ChatService, private _route: ActivatedRoute) {
+    this.messageInput = '';
+    this.userId = '';
+    this.messageList = [];
+   }
 
   ngOnInit(): void {
-    this._chatService.initialConnectionSocket();
+    this.userId = this._route.snapshot.params['userId'];
+    this._chatService.joinRoom('ABC');
+    this.listenMessages();
   }
 
+  public sendMessage(): void {
+    const chatMessage = {
+      message: this.messageInput,
+      user: this.userId
+    } as ChatMessage
+    this._chatService.sendMessage('ABC', chatMessage);
+    this.messageInput = '';
+  }
+
+  public listenMessages(): void {
+    this._chatService.getMessageSubject().subscribe((messages: ChatMessage[]) => {
+      this.messageList = messages.map((item: ChatMessage) => ({
+        ...item,
+        messageSide: item.user === this.userId ? 'sender' : 'reciver'
+      }));
+    });
+  }
 }
