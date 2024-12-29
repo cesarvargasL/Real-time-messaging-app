@@ -27,6 +27,7 @@ export class ChatService {
     this._stompClient.onConnect= () => {
       this._stompClient.subscribe(`/topic/${roomId}`, (messages: Message) => {
         const messageContent = JSON.parse(messages.body);
+        messageContent.profileImage = messageContent.user === '1' ? 'assets/user1.webp' : 'assets/user2.webp';
         this.messageSubject.next([...this.messageSubject.getValue(), messageContent]);
       });
     };
@@ -34,6 +35,7 @@ export class ChatService {
   }
 
   public sendMessage(roomId: string, chatMessage: ChatMessage): void {
+    chatMessage.profileImage = chatMessage.user === '1' ? 'assets/user1.webp' : 'assets/user2.webp';
     this._stompClient.publish({
       destination: `/app/chat/${roomId}`,
       body: JSON.stringify(chatMessage)

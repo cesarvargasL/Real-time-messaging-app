@@ -29,7 +29,9 @@ export class ChatComponent implements OnInit {
   public sendMessage(): void {
     const chatMessage = {
       message: this.messageInput,
-      user: this.userId
+      user: this.userId,
+      messageSide: this.userId === '1' ? 'sender' : 'reciver',
+      profileImage: this.userId === '1' ? 'assets/user1.webp' : 'assets/user2.webp'
     } as ChatMessage
     this._chatService.sendMessage('ABC', chatMessage);
     this.messageInput = '';
